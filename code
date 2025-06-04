@@ -1,0 +1,114 @@
+// Convert image to grayscale
+void grayscale(int height, int width, RGBTRIPLE image[height][width])
+{
+    //image is RGB has 24 bits
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            int rounded;
+            float average = (float)(image[i][j].rgbtGreen + image[i][j].rgbtBlue + image[i][j].rgbtRed)/ 3.0;
+            if (average < 0) rounded = (int)(average - 0.5);
+            else rounded = (int)(average + 0.5); //I must find integer average
+            image[i][j].rgbtGreen = image[i][j].rgbtBlue = image[i][j].rgbtRed = rounded;
+        }
+    }
+}
+
+// Convert image to sepia
+void sepia(int height, int width, RGBTRIPLE image[height][width])
+
+{
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            float limit[3];
+            limit[0] = image[i][j].rgbtGreen * .769 + image[i][j].rgbtBlue * .189 + image[i][j].rgbtRed * .393;
+            limit[1] = image[i][j].rgbtGreen * .686 + image[i][j].rgbtBlue * .168 + image[i][j].rgbtRed * .349;
+            limit[2] = image[i][j].rgbtGreen * .534 + image[i][j].rgbtBlue * .131 + image[i][j].rgbtRed * .272;
+
+            for (int k = 0; k < 3; k++)
+            {
+                int rounded;
+                if (limit[k] > 255) limit[k] = 255;
+                else (limit[k] = (int)(limit[k] + 0.5));
+            }
+            image[i][j].rgbtRed = limit[0];
+            image[i][j].rgbtGreen = limit[1];
+            image[i][j].rgbtBlue = limit[2];
+        }
+    }
+    return;
+}
+
+// Reflect image horizontally
+void reflect(int height, int width, RGBTRIPLE image[height][width])
+{
+
+    // Don't need it anymore. if (width % 2 == 0)// It's an even
+
+        for (int i = 0; i < height; i++)
+        {
+            int holder = width - 1;
+            for (int j = 0; j < width/2; j++)
+            {
+                RGBTRIPLE temp = image[i][holder];
+                image[i][holder] = image[i][j];
+                image[i][j] = temp;
+                holder --;
+            }
+        }
+
+}
+
+// Blur image
+void blur(int height, int width, RGBTRIPLE image[height][width])
+{
+RGBTRIPLE save[height][width];
+
+    // Loop over every pixel
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            int red = 0;
+            int green = 0;
+            int blue = 0;
+            int count = 0;
+
+            // Loop over 3×3 box centered at (i, j)
+            for (int di = -1; di <= 1; di++)
+            {
+                for (int dj = -1; dj <= 1; dj++)
+                {
+                    int ni = i + di;
+                    int nj = j + dj;
+
+                    // Check if neighbor (ni, nj) is within bounds
+                    if (ni >= 0 && ni < height && nj >= 0 && nj < width)
+                    {
+                        red += image[ni][nj].rgbtRed;
+                        green += image[ni][nj].rgbtGreen;
+                        blue += image[ni][nj].rgbtBlue;
+                        count++;
+                    }
+                }
+            }
+
+            // Store the averaged values in the temp buffer
+            save[i][j].rgbtRed = (int)((red / (float)count) + 0.5);
+            save[i][j].rgbtGreen = (int)((green / (float)count) + 0.5);
+            save[i][j].rgbtBlue = (int)((blue / (float)count) + 0.5);
+        }
+    }
+
+    // Copy the blurred values back into the original image
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            image[i][j] = save[i][j];
+        }
+    }
+}
