@@ -24,6 +24,7 @@ void sepia(int height, int width, RGBTRIPLE image[height][width])
         for (int j = 0; j < width; j++)
         {
             float limit[3];
+            //Using sepia formula
             limit[0] = image[i][j].rgbtGreen * .769 + image[i][j].rgbtBlue * .189 + image[i][j].rgbtRed * .393;
             limit[1] = image[i][j].rgbtGreen * .686 + image[i][j].rgbtBlue * .168 + image[i][j].rgbtRed * .349;
             limit[2] = image[i][j].rgbtGreen * .534 + image[i][j].rgbtBlue * .131 + image[i][j].rgbtRed * .272;
@@ -45,9 +46,6 @@ void sepia(int height, int width, RGBTRIPLE image[height][width])
 // Reflect image horizontally
 void reflect(int height, int width, RGBTRIPLE image[height][width])
 {
-
-    // Don't need it anymore. if (width % 2 == 0)// It's an even
-
         for (int i = 0; i < height; i++)
         {
             int holder = width - 1;
@@ -62,7 +60,7 @@ void reflect(int height, int width, RGBTRIPLE image[height][width])
 
 }
 
-// Blur image
+// Blur image using box blured
 void blur(int height, int width, RGBTRIPLE image[height][width])
 {
 RGBTRIPLE save[height][width];
@@ -78,6 +76,7 @@ RGBTRIPLE save[height][width];
             int count = 0;
 
             // Loop over 3×3 box centered at (i, j)
+            // Using 9 grids to calculate the average value
             for (int di = -1; di <= 1; di++)
             {
                 for (int dj = -1; dj <= 1; dj++)
