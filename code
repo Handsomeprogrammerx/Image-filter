@@ -108,6 +108,74 @@ RGBTRIPLE save[height][width];
         for (int j = 0; j < width; j++)
         {
             image[i][j] = save[i][j];
+
         }
     }
 }
+
+
+//Detect object's edges
+void edges(int height, int width, RGBTRIPLE image[height][width])
+{
+    RGBTRIPLE copy [height][width];
+    //Convolutional matrix(Sobel's operator)
+    int gx[3][3] = {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}};
+    int gy[3][3] = {{-1, -2, -1}, {0, 0, 0}, {1, 2, 1}};
+
+    //Loop over each pixel
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            int redx = 0;
+            int greenx = 0;
+            int bluex = 0;
+            int redy = 0;
+            int greeny = 0;
+            int bluey = 0;
+            //Loop over 8 surrounded pixesls
+            for (int ni = -1; ni < 2; ni++)
+            {
+                for (int nj = -1; nj < 2; nj++)
+                {
+                    //Check the edges
+                    int gi = i + ni;
+                    int gj = j + nj;
+                    if (gi < 0 || gi >= height || gj < 0 || gj >= width)
+                    continue;
+
+                        int ki = ni + 1;
+                        int kj = nj + 1;
+                        //Apply the formula
+                        redx += image[gi][gj].rgbtRed * gx[ki][kj];
+                        redy += image[gi][gj].rgbtRed * gy[ki][kj];
+                        greenx += image[gi][gj].rgbtGreen * gx[ki][kj];
+                        greeny += image[gi][gj].rgbtGreen * gy[ki][kj];
+                        bluex += image[gi][gj].rgbtBlue * gx[ki][kj];
+                        bluey += image[gi][gj].rgbtBlue * gy[ki][kj];
+
+
+                }
+            }
+            //Compute a positive summation of gx and gy
+            int sumr = round(sqrt((redx*redx) + (redy*redy)));
+            if (sumr > 255) sumr = 255;
+            copy[i][j].rgbtRed = sumr;
+            int sumg = round(sqrt((greenx*greenx) + (greeny*greeny)));
+            if (sumg > 255) sumg = 255;
+            copy[i][j].rgbtGreen = sumg;
+            int sumb = round(sqrt((bluex*bluex) + (bluey*bluey)));
+            if (sumb > 255) sumb = 255;
+            copy[i][j].rgbtBlue = sumb;
+        }
+    }
+    
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            image[i][j] = copy[i][j];
+        }
+    }
+}
+
